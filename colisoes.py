@@ -4,9 +4,13 @@ from sys import exit
 import random
 import numpy
 
+# Coef. de restituição
 CR = 1
 
-N_BOLAS = 30
+N_BOLAS = 25
+
+# =================================================================================                    
+# Funções auxiliares
 
 def displace(dist, r1, r2):
     return 0.5 * (dist - r1 - r2)
@@ -20,12 +24,18 @@ def temOverlap(b1, b2):
 
 def projecao(vec1, vec2):
     return (numpy.multiply(vec2, numpy.divide(numpy.dot(vec1, vec2), numpy.linalg.norm(vec2)**2 )))
-    
+# =================================================================================                    
+
 pygame.init()
 
 largura, altura = 800, 600
 tela = pygame.display.set_mode((largura, altura))
 
+font = pygame.font.Font('freesansbold.ttf', 16)
+
+green = (0, 255, 0)
+blue = (0, 0, 128)
+black = (0, 0, 0)
 
 # =================================================================================
 # Classe Bola
@@ -43,7 +53,7 @@ class Bola:
         pygame.draw.circle(tela, self.cor, (self.p[0], self.p[1]), self.raio)
 
 # =================================================================================
-# Criando as bolas
+# Criando as bolas, conferindo se elas não se sobrepõem e se alguma delas não "spawna" fora da tela
 
 bolas = []
 for i in range(N_BOLAS):
@@ -79,19 +89,64 @@ relogio = pygame.time.Clock()
 running = True
 
 while running:
+
     relogio.tick(30)
 
     tela.fill((0, 0, 0))
+
+
+    # =================================================================================                    
+    # Cálcula a energia cinética eixo-a-eixo e imprime na tela
+
+    ekx = 0
+    eky = 0
+    ekt = 0
+    for bola in bolas:
+        ekx += numpy.divide(numpy.multiply(bola.massa, numpy.multiply(bola.v[0], bola.v[0])), 2)
+        eky += numpy.divide(numpy.multiply(bola.massa, numpy.multiply(bola.v[1], bola.v[1])), 2)
+        ekt += 0.5 * bola.massa * (numpy.linalg.norm(bola.v) ** 2)
+
+
+    ekx = round(ekx, 2)
+    eky = round(eky, 2)
+    ekt = round(ekt, 2)
+
+    text = font.render(f'Ekx = {ekx}', True, green, black)
+    textRect1 = text.get_rect()
+    textRect1.center = (largura // 2, altura // 2 - 20)
+
+    text2 = font.render(f'Eky = {eky}', True, green, black)
+    textRect2 = text2.get_rect()
+    textRect2.center = (largura // 2, altura // 2 + 20)
+
+    ekt = sum(0.5 * bola.massa * (numpy.linalg.norm(bola.v) ** 2) for bola in bolas)
+    ekt = round(ekt, 2)
+
+    text_ekt = font.render(f'Ekt = {ekt}', True, green, black)
+    textRect_ekt = text_ekt.get_rect()
+    textRect_ekt.center = (largura // 2, altura // 2 + 60)
+    tela.blit(text_ekt, textRect_ekt)
+
+    tela.blit(text, textRect1)
+    tela.blit(text2, textRect2)
+
+    # =================================================================================                    
 
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             exit()
 
+    # =================================================================================                    
+    # Desenha bolas e atualiza as posições de acordo com as velocidades
+
     for i in range(len(bolas)):
         bolas[i].draw()
         bolas[i].p[0] += bolas[i].v[0]
         bolas[i].p[1] += bolas[i].v[1]
+    
+    # =================================================================================                    
+    # Colisão com as bordas
 
     for i in range(len(bolas)):
         if (bolas[i].p[0] <= bolas[i].raio):
@@ -107,11 +162,14 @@ while running:
         elif (bolas[i].p[1] >= altura - bolas[i].raio):
             bolas[i].p[1] = altura - bolas[i].raio
             bolas[i].v[1] *= -1
+    # =================================================================================                    
+
         
         for j in range(i+1, len(bolas)):
             if i != j:
                 if temOverlap(bolas[i], bolas[j]):
 
+                    # =================================================================================                    
                     # Movendo as bolas pra posição em que elas apenas se tangenciam
 
                     distancia = dist(bolas[i].p, bolas[j].p)
@@ -123,6 +181,7 @@ while running:
                     bolas[j].p[0] += q_displace * (bolas[i].p[0] - bolas[j].p[0]) / distancia
                     bolas[j].p[1] += q_displace * (bolas[i].p[1] - bolas[j].p[1]) / distancia
 
+                    # =================================================================================
                     # Alterando as velocidades
 
                     normal = numpy.subtract(bolas[i].p, bolas[j].p)
@@ -149,6 +208,7 @@ while running:
                     v2 = numpy.add(v2p, v2t)
 
                     bolas[i].v = v1
-                    bolas[j].v = v2                    
+                    bolas[j].v = v2   
+                    # =================================================================================
 
     pygame.display.update()   
