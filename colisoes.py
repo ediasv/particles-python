@@ -5,9 +5,9 @@ import random
 import numpy
 
 # Coef. de restituição
-CR = 1
+CR = 0
 
-N_BOLAS = 25
+N_BOLAS = 23
 
 # =================================================================================                    
 # Funções auxiliares
@@ -53,7 +53,7 @@ class Bola:
         pygame.draw.circle(tela, self.cor, (self.p[0], self.p[1]), self.raio)
 
 # =================================================================================
-# Criando as bolas, conferindo se elas não se sobrepõem e se alguma delas não "spawna" fora da tela
+# Criando as bolas, conferindo se elas não se sobrepõem
 
 bolas = []
 for i in range(N_BOLAS):
@@ -71,16 +71,6 @@ for i in range(N_BOLAS):
             if i != j:
                 if temOverlap(bolas[i], bolas[j]):
                     valido = False
-    
-    if bolas[i].p[0] <= bolas[i].raio:
-        bolas[i].p[0] = bolas[i].raio*2
-    elif bolas[i].p[0] >= largura - bolas[i].raio:
-        bolas[i].p[0] = largura - bolas[i].raio*2
-
-    if bolas[i].p[1] <= bolas[i].raio:
-        bolas[i].p[1] = bolas[i].raio*2
-    elif bolas[i].p[1] >= altura - bolas[i].raio:
-        bolas[i].p[1] = altura - bolas[i].raio*2
         
 # =================================================================================
 
@@ -93,7 +83,6 @@ while running:
     relogio.tick(30)
 
     tela.fill((0, 0, 0))
-
 
     # =================================================================================                    
     # Cálcula a energia cinética eixo-a-eixo e imprime na tela
