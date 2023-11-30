@@ -5,9 +5,9 @@ import random
 import numpy
 
 # Coef. de restituição
-CR = 1
+CR = 0
 
-N_BOLAS = 12
+N_BOLAS = 20
 
 # =================================================================================                    
 # Funções auxiliares
@@ -46,9 +46,9 @@ class Bola:
     def __init__(self) -> None:
         self.p = [random.randint(40, largura - 40), random.randint(40, altura - 40)]
         self.v = [random.randint(-5, 5), random.randint(-5, 5)]
-        self.raio = random.randint(30, 40)
+        self.raio = random.randint(25, 40)
         self.cor = (255, 255, 255)
-        self.massa = self.raio**2
+        self.massa = self.raio
     
     def draw(self):
         pygame.draw.circle(tela, self.cor, (self.p[0], self.p[1]), self.raio)
@@ -65,13 +65,13 @@ for i in range(N_BOLAS):
         if i != j:
             if temOverlap(bolas[i], bolas[j]):
                 valido = False
-    while not valido:
-        bolas[i] = Bola()
-        valido = True
-        for j in range(len(bolas)):
-            if i != j:
-                if temOverlap(bolas[i], bolas[j]):
-                    valido = False
+        while not valido:
+            bolas[i] = Bola()
+            valido = True
+            for j in range(len(bolas)):
+                if i != j:
+                    if temOverlap(bolas[i], bolas[j]):
+                        valido = False
         
 # =================================================================================
 
@@ -115,8 +115,8 @@ while running:
     text_ekt = font.render(f'Ekt = {ekt}', True, green, black)
     textRect_ekt = text_ekt.get_rect()
     textRect_ekt.center = (largura // 2, altura // 2 + 60)
-    tela.blit(text_ekt, textRect_ekt)
 
+    tela.blit(text_ekt, textRect_ekt)
     tela.blit(text, textRect1)
     tela.blit(text2, textRect2)
 
@@ -152,6 +152,7 @@ while running:
         elif (bolas[i].p[1] >= altura - bolas[i].raio):
             bolas[i].p[1] = altura - bolas[i].raio
             bolas[i].v[1] *= -1
+
     # =================================================================================                    
 
         
@@ -174,22 +175,22 @@ while running:
                     # =================================================================================
                     # Alterando as velocidades
 
-                    normal = numpy.subtract(bolas[i].p, bolas[j].p)
+                    r = numpy.subtract(bolas[i].p, bolas[j].p)
 
                     v1 = bolas[i].v
-                    v1p = projecao(v1, normal)
+                    v1p = projecao(v1, r)
                     v1t = numpy.subtract(v1, v1p)
                     m1 = bolas[i].massa
 
                     v2 = bolas[j].v
-                    v2p = projecao(v2, normal)
+                    v2p = projecao(v2, r)
                     v2t = numpy.subtract(v2, v2p)
                     m2 = bolas[j].massa
 
-                    numerator = numpy.add(numpy.multiply(m1, v1), numpy.multiply(m2, v2))
-                    denominator = m1 + m2
-                    vcm = numpy.divide(numerator, denominator)
-                    vcm = projecao(vcm, normal)
+                    numerador = numpy.add(numpy.multiply(m1, v1), numpy.multiply(m2, v2))
+                    denominador = m1 + m2
+                    vcm = numpy.divide(numerador, denominador)
+                    vcm = projecao(vcm, r)
 
                     v1p = numpy.subtract(numpy.multiply(1+CR, vcm), numpy.multiply(CR, v1p))
                     v2p = numpy.subtract(numpy.multiply(1+CR, vcm), numpy.multiply(CR, v2p))
