@@ -5,9 +5,9 @@ import random
 import numpy
 
 # Coef. de restituição
-CR = 0
+CR = 1
 
-N_BOLAS = 23
+N_BOLAS = 12
 
 # =================================================================================                    
 # Funções auxiliares
@@ -24,6 +24,7 @@ def temOverlap(b1, b2):
 
 def projecao(vec1, vec2):
     return (numpy.multiply(vec2, numpy.divide(numpy.dot(vec1, vec2), numpy.linalg.norm(vec2)**2 )))
+
 # =================================================================================                    
 
 pygame.init()
@@ -45,9 +46,9 @@ class Bola:
     def __init__(self) -> None:
         self.p = [random.randint(40, largura - 40), random.randint(40, altura - 40)]
         self.v = [random.randint(-5, 5), random.randint(-5, 5)]
-        self.raio = random.randint(10, 40)
+        self.raio = random.randint(30, 40)
         self.cor = (255, 255, 255)
-        self.massa = self.raio
+        self.massa = self.raio**2
     
     def draw(self):
         pygame.draw.circle(tela, self.cor, (self.p[0], self.p[1]), self.raio)
