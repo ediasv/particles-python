@@ -5,9 +5,9 @@ import random
 import numpy
 
 # Coef. de restituição
-CR = 0
+CR = 1
 
-N_BOLAS = 20
+N_BOLAS = 200
 
 # =================================================================================                    
 # Funções auxiliares
