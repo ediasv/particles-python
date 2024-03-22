@@ -1,2 +1,2 @@
 # Colisoes
- Trabalho de física
+ Simulação de colisões entre bolinhas, desconsiderando rotações.
